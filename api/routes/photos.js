@@ -87,6 +87,20 @@ router.get("/photoInfo/:photoId", (req, res, next) => {
     });
 });
 
+router.patch("/photoInfo/:photoId", (req, res, next) => {
+    console.log(req.body);
+    Photo.findByIdAndUpdate({_id: req.params.photoId}, {$set: req.body})
+    .exec()
+    .then(res.status(200).json({
+        message: "updated successfully"
+    }))
+    .catch(err => {
+        res.status(500).json({
+            error: err
+        });
+    });    
+});
+
 router.get("/photo/:photoId", (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
@@ -126,12 +140,10 @@ router.delete("/photo/:photoId", (req, res, next) => {
     });    
 });
 
-
 router.patch("/photo/:photoId", upload.single("photo"), (req, res, next) => {
     Photo.findOne({_id: req.params.photoId})
     .exec()
     .then(docs => {
-        console.log(docs);
         fs.unlink(docs.photoPath, err => {});
         Photo.updateOne({_id: req.params.photoId}, {photoPath: req.file.path})
         .exec()

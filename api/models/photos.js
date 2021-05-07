@@ -6,7 +6,7 @@ const photoSchema = mongoose.Schema({
     title: {type: String, required: true},
     description: String,
     date: {type: Date, default: Date.now},
-    isPublic: Boolean,
+    isPublic: {type: Boolean, default: true},
     taggedPeople: [{type: String}],
     tags: [{type: String}],
     cameraName: {type: String},
