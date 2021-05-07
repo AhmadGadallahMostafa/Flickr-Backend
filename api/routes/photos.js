@@ -42,9 +42,6 @@ router.get("/:limit", (req, res, next) => {
 });
 
 router.post("/", upload.single("photo"),(req, res, next) => {
-
-    
-    
     const photo = new Photo({
         _id: new mongoose.Types.ObjectId(),
         authorId: req.body.authorId,
@@ -102,5 +99,58 @@ router.get("/photo/:photoId", (req, res, next) => {
         });
     });
 });
+
+router.delete("/photo/:photoId", (req, res, next) => {
+    Photo.findOne({_id: req.params.photoId})
+    .exec()
+    .then(docs => {
+        console.log(docs);
+        fs.unlink(docs.photoPath, err => {});
+        Photo.deleteOne({_id: req.params.photoId})
+        .exec()
+        .then(
+            res.status(200).json({
+                message: "photo deleted successfully"
+            })
+        )
+        .catch( err => {
+            err.status(500).json({
+                error: err
+            });
+        });
+    })
+    .catch(err => {
+        res.status(500).json({
+            error: err
+        });
+    });    
+});
+
+
+router.patch("/photo/:photoId", upload.single("photo"), (req, res, next) => {
+    Photo.findOne({_id: req.params.photoId})
+    .exec()
+    .then(docs => {
+        console.log(docs);
+        fs.unlink(docs.photoPath, err => {});
+        Photo.updateOne({_id: req.params.photoId}, {photoPath: req.file.path})
+        .exec()
+        .then(res.status(200).json({
+            message: "updated successfully"
+        }))
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        });    
+    })
+    .catch(err => {
+        res.status(500).json({
+            error: err
+        });
+    });    
+});
+
+
 
 module.exports = router;
