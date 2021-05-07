@@ -9,7 +9,7 @@ const photosRoutes = require("./api/routes/photos");
 const usersRoutes=require("./api/routes/user");
 
 
-mongoose.connect("mongodb+srv://Moaz:" + process.env.MONGO_ATLAS_PW + "@cluster0.c1goi.mongodb.net/Flickerdb?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect("mongodb://localhost:27017/userDB",{useNewUrlParser:true, useUnifiedTopology: true});
 
 
 

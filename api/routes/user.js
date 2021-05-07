@@ -3,8 +3,73 @@ const router=express.Router();
 const mongoose=require("mongoose");
 const bcrypt=require("bcrypt");
 const jwt=require("jsonwebtoken");
+require("dotenv").config();
 
 const User=require('../models/user');
+const checkAuth=require("../middleware/check-auth")
+
+
+router.patch("/:userid",checkAuth,(req,res,next)=>{
+    if(req.body.password.length>8 && req.body.age>=18 )
+    {
+    
+            bcrypt.hash(req.body.password,10,(err,hash)=>{
+
+                if(err)
+                {
+                    return res.status(500).json({
+                        error:err
+            
+                    });
+                }else{
+            
+                    User.findByIdAndUpdate({_id:req.params.userid},
+                        {"firstName": req.body.firstName,
+                        "secondName":req.body.secondName,
+                        "age":req.body.age,
+                        "password":hash,
+                    
+                    }
+                    , function(err, result){
+                
+                        if(err){
+                            res.send(err)
+                        }
+                        else{
+                            res.send(result)
+                        }
+                
+                    });
+            
+                }
+            
+               });
+        
+    }else{
+    res.json({
+        message:"error"
+    });
+}
+
+
+});
+
+router.get("/:userid",(req,res,next)=>{
+    User.findOne({_id: req.params.userid}).exec().then(user => {
+            let found = {
+                firstName:user.firstName,
+                secondName:user.secondName
+            };
+            res.status(200).json(found);
+
+
+            }
+            
+
+        );
+
+    });
+
 
 
 router.post("/signup",(req,res,next)=>
