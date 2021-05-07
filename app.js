@@ -1,11 +1,16 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const bodyParser=require("body-parser");
+
 const mongoose = require("mongoose");
 
 const photosRoutes = require("./api/routes/photos");
+const usersRoutes=require("./api/routes/user");
+
 
 mongoose.connect("mongodb+srv://Moaz:" + process.env.MONGO_ATLAS_PW + "@cluster0.c1goi.mongodb.net/Flickerdb?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true});
+
 
 
 app.use(morgan("dev"));
@@ -22,8 +27,9 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/singlePhoto", express.static("photos"));
 app.use("/photos", photosRoutes);
+app.use("/user",usersRoutes);
+
 
 app.use((req, res, next) =>{
     const error = new Error("404 not found");
