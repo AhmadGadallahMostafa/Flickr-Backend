@@ -28,10 +28,16 @@ router.delete("/:userid",checkAuth,(req,res,next)=>{
 
                   User.deleteOne({ _id: req.params.userid}, function(err) {
                       if (!err) {
-                          console.log("success");
+                          res.json({
+                              message:"Success"
+
+                          });
                        }
                         else {
-                console.log("failed");
+                            res.json({
+                                message:"failed"
+  
+                            });
                                         }
     });
 }
