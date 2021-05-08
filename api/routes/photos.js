@@ -46,7 +46,7 @@ router.post("/", upload.single("photo"),(req, res, next) => {
         _id: new mongoose.Types.ObjectId(),
         authorId: req.body.authorId,
         title: req.body.title,
-        description: req.body.title,
+        description: req.body.description,
         date: req.body.date,
         isPublic: req.body.isPublic,
         taggedPeople: req.body.taggedPeople,
