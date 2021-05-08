@@ -9,7 +9,7 @@ const User=require('../models/user');
 const checkAuth=require("../middleware/check-auth")
 
 
-router.delete("/:userid",(req,res,next)=>{
+router.delete("/:userid",checkAuth,(req,res,next)=>{
 
     User.findOne({_id: req.params.userid}).exec().then(user => {
         bcrypt.compare(req.body.password,user.password,(err,respond) =>
