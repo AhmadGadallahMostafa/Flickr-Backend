@@ -9,6 +9,39 @@ const User=require('../models/user');
 const checkAuth=require("../middleware/check-auth")
 
 
+router.delete("/:userid",(req,res,next)=>{
+
+    User.findOne({_id: req.params.userid}).exec().then(user => {
+        bcrypt.compare(req.body.password,user.password,(err,respond) =>
+            {
+            
+                if(err)
+                {
+                    return res.status(401).json({
+                        message:"failed"
+    
+                    });
+                }
+                if(respond)
+                {
+
+
+                  User.deleteOne({ _id: req.params.userid}, function(err) {
+                      if (!err) {
+                          console.log("success");
+                       }
+                        else {
+                console.log("failed");
+                                        }
+    });
+}
+
+
+});
+    });
+});
+
+
 router.patch("/:userid",checkAuth,(req,res,next)=>{
     if(req.body.password.length>8 && req.body.age>=18 )
     {
