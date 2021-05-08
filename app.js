@@ -5,13 +5,13 @@ const bodyParser=require("body-parser");
 
 const mongoose = require("mongoose");
 
+require("dotenv").config();
+
 const photosRoutes = require("./api/routes/photos");
-const usersRoutes=require("./api/routes/user");
+const usersRoutes = require("./api/routes/user");
 const albumRoutes = require('./api/routes/album');
 
-
-mongoose.connect("mongodb+srv://Moaz:" + process.env.MONGO_ATLAS_PW + "@cluster0.c1goi.mongodb.net/Flickerdb?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true});
-
+mongoose.connect(process.env.URL, {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(morgan("dev"));
 app.use(express.urlencoded({extended: true}));
