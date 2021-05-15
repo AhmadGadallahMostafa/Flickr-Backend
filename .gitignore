@@ -1,4 +1,10 @@
 API Document
 ER Diagram
+
+.vscode/
+
+# Dependency directories
+node_modules/
+
+# dotenv environment variables file
 .env
-node_modules
