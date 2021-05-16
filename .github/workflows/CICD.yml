@@ -93,7 +93,7 @@ jobs:
             User git
             IdentityFile ~/.ssh/Clone.key
           END
-          rm -rf ~/Backend && echo "removed BackEnd/"
+          rm -rf ~/BackEnd && echo "removed BackEnd/"
           git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
           EOF
         env:
