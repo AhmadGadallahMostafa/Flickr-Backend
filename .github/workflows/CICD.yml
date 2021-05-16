@@ -29,12 +29,8 @@ jobs:
           chmod 700 ~/.ssh
           echo "$SSH_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
-<<<<<<< HEAD
           ssh-add ~/.ssh/Clone.key
           git clone git@github.com:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
-=======
-          sudo git clone git@github.com:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
->>>>>>> fe4b2154b694855301fc8bafe1a00a8964753890
         env:
           SSH_Clone_KEY: ${{ secrets.SSH_BackEnd_Clone_KEY }}
       
