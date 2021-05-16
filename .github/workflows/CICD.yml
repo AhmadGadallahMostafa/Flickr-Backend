@@ -96,6 +96,7 @@ jobs:
             IdentityFile ~/.ssh/Clone.key
           END
           rm -rf ~/Backend && echo "removed BackEnd/"
+          echo "Start Cloning Trial"
           git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
           EOF
         env:
