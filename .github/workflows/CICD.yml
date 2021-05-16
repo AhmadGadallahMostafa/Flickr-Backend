@@ -29,12 +29,12 @@ jobs:
           chmod 700 ~/.ssh
           echo "$SSH_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
-          sudo cat >~/.ssh/config <<END
+          sudo cat >>~/.ssh/config <<END
             Host BackEndRepo
             Hostname github.com
             User git
             IdentityFile ~/.ssh/Clone.key
-          END          
+          END
           ls ~/BackEnd && echo "empty"
           git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
           ls ~/BackEnd && echo "empty"
@@ -47,6 +47,7 @@ jobs:
           cat >>~/Testing.sh<<END
           #!/bin/bash
           echo "Testing Done..."
+          ls ~/BackEnd && echo "empty"
           END
           chmod +x ~/Testing.sh
       
@@ -88,8 +89,14 @@ jobs:
           chmod 700 ~/.ssh
           echo "$SSH_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
-          rm -rf ~/Backend
-          git clone git@github.com:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
+          sudo cat >>~/.ssh/config <<END
+            Host BackEndRepo
+            Hostname github.com
+            User git
+            IdentityFile ~/.ssh/Clone.key
+          END
+          rm -rf ~/Backend && echo "removed BackEnd/"
+          git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
           END
         env:
           SSH_Clone_KEY: ${{ secrets.SSH_BackEnd_Clone_KEY }}
