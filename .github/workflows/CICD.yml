@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "$SSH_BackEnd_Clone_KEY" > ~/.ssh/Clone.key
+          echo "$SSH_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
           git clone git@github.com:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
         env:
@@ -77,7 +77,7 @@ jobs:
           cat >>~/Fetch.sh<<END
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "$SSH_BackEnd_Clone_KEY" > ~/.ssh/Clone.key
+          echo "$SSH_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
           rm -rf ~/Backend
           git clone git@github.com:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
