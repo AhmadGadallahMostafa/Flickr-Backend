@@ -84,7 +84,7 @@ jobs:
       # Task[2]: create bach scripts to ease passing it run multiple commands
       - name: Creat Fetch.sh scripts
         run: |
-          cat >>~/Fetch.sh<<END
+          cat >>~/Fetch.sh<<EOF
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           echo "$SSH_Clone_KEY" > ~/.ssh/Clone.key
@@ -97,7 +97,7 @@ jobs:
           END
           rm -rf ~/Backend && echo "removed BackEnd/"
           git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
-          END
+          EOF
         env:
           SSH_Clone_KEY: ${{ secrets.SSH_BackEnd_Clone_KEY }}
       
