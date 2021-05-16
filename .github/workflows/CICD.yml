@@ -118,4 +118,3 @@ jobs:
       # Task[5]: Excute AfterDeploy.sh
       - name: Set Production enviroment for BackEnd Code
         run: cat ~/AfterDeploy.sh | ssh staging
-      
