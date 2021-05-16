@@ -25,6 +25,8 @@ jobs:
       # Task[1]: Get Clone Key on the Runner
       - name: Prepare the Clone Key on the runner && clone
         run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           echo "$SSH_BackEnd_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
           git clone git@github.com:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
@@ -73,6 +75,8 @@ jobs:
       - name: Creat Fetch.sh scripts
         run: |
           cat >>~/Fetch.sh<<END
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           echo "$SSH_BackEnd_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
           rm -rf ~/Backend
