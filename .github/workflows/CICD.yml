@@ -35,9 +35,7 @@ jobs:
             User git
             IdentityFile ~/.ssh/Clone.key
           END
-          ls ~/BackEnd && echo "empty"
           git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
-          ls ~/BackEnd && echo "empty"
         env:
           SSH_Clone_KEY: ${{ secrets.SSH_BackEnd_Clone_KEY }}
       
@@ -96,7 +94,6 @@ jobs:
             IdentityFile ~/.ssh/Clone.key
           END
           rm -rf ~/Backend && echo "removed BackEnd/"
-          echo "Start Cloning Trial"
           git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
           EOF
         env:
