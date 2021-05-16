@@ -102,3 +102,20 @@ jobs:
       # Task[3]: Test by trying to SSH to the EC2 instance and pass the script to be excuted
       - name: Clone repos on server
         run: cat ~/Fetch.sh | ssh staging
+      
+      # Task[4]: Creat AfterDeploy.sh script to prepare backend code for production
+      - name: Prepare script to Set Production enviroment for BackEnd Code
+        run: |
+          cat >>~/AfterDeploy.sh<<EOF
+          cd ~/BackEnd/
+          npm install
+          cp ~/BackUp/.env ~/BackEnd/.env
+          sudo cp ~/BackEnd/Server/config /etc/nginx/sites-available/default
+          pm2 start ~/BackEnd/server.js --name "BackEnd Server" --watch
+          sudo systemctl restart nginx
+          EOF
+      
+      # Task[5]: Excute AfterDeploy.sh
+      - name: Set Production enviroment for BackEnd Code
+        run: cat ~/AfterDeploy.sh | ssh staging
+      
