@@ -75,6 +75,7 @@ jobs:
           cat >>~/Fetch.sh<<END
           echo "$SSH_BackEnd_Clone_KEY" > ~/.ssh/Clone.key
           chmod 600 ~/.ssh/Clone.key
+          rm -rf ~/Backend
           git clone git@github.com:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
           END
         env:
