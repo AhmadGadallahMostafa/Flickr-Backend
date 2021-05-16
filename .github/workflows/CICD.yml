@@ -35,9 +35,9 @@ jobs:
             User git
             IdentityFile ~/.ssh/Clone.key
           END          
-          ls ~/BackEnd
+          ls ~/BackEnd && echo "empty"
           git clone BackEndRepo:AhmadGadallahMostafa/Flickr-Backend.git ~/BackEnd
-          ls ~/BackEnd
+          ls ~/BackEnd && echo "empty"
         env:
           SSH_Clone_KEY: ${{ secrets.SSH_BackEnd_Clone_KEY }}
       
@@ -48,6 +48,7 @@ jobs:
           #!/bin/bash
           echo "Testing Done..."
           END
+          chmod +x ~/Testing.sh
       
       # Task[3]: Run testing scripts Scripts
       - name: Run Testing.sh scripts
