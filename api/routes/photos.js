@@ -11,14 +11,14 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "./photos/");
+        cb(null, path.join(__dirname, "../../photos/"));
     },
     filename: function(req, file, cb) {
         cb(null, Date.now() + file.originalname);
     }
 });
 
-const upload = multer(storage);
+const upload = multer({storage: storage});
 
 const Photo = require("../models/photos"); 
 
@@ -105,7 +105,7 @@ router.get("/photo/:photoId", (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
     .then(docs => {
-        res.status(200).sendFile(path.join(__dirname, "../../",docs.photoPath));
+        res.status(200).sendFile(docs.photoPath);
     })
     .catch(err => {
         res.status(500).json({
