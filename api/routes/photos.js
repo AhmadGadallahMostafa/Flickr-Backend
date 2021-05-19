@@ -11,7 +11,14 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null,path.join(process.cwd(), "/photos"));
+        const dir = path.join(__dirname, "../../photos");
+        if(!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+            cb(null, dir);
+        }
+        else{
+            cb(null, dir);
+        }
     },
     filename: function(req, file, cb) {
         cb(null, Date.now() + file.originalname);
@@ -41,7 +48,7 @@ router.get("/:limit", (req, res, next) => {
     });
 });
 
-router.post("/", upload.single("photo"),(req, res, next) => {
+router.post("/", upload.single("photo"), (req, res, next) => {
     const photo = new Photo({
         _id: new mongoose.Types.ObjectId(),
         authorId: req.body.authorId,
