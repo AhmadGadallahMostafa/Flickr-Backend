@@ -11,7 +11,7 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../../"));
+        cb(null,path.join(process.cwd(), "/photos"));
     },
     filename: function(req, file, cb) {
         cb(null, Date.now() + file.originalname);
@@ -54,7 +54,6 @@ router.post("/", upload.single("photo"),(req, res, next) => {
         cameraName: req.body.cameraName,
         photoPath: req.file.path
     });
-
     photo.save()
 
     .then(result => {
