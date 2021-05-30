@@ -30,7 +30,9 @@ const upload = multer({storage: storage});
 const Photo = require("../models/photos"); 
 const User = require("../models/user");
 
-const checkAuth=require("../middleware/check-auth")
+const checkAuth = require("../middleware/check-auth");
+
+
 
 router.get("/:limit", (req, res, next) => {
     Photo.find({isPublic: true})
@@ -243,6 +245,111 @@ router.patch("/photo/:photoId", checkAuth, upload.single("photo"), (req, res, ne
     }); 
 });
 
+router.post("/photo/add-favorite/:photoId", checkAuth, (req, res, next) => {
+    Photo.findById(req.params.photoId)
+    .exec()
+    .then(photo => {
+        User.findById(req.body.userId).exec().then(user => {
+            if (!photo) {
+                res.status(404).json({
+                    message: "photo does not exist"
+                });    
+            } else if (!user) {
+                res.status(404).json({
+                    message: "user does not exist"
+                });    
+            } else if (!req.body.userId) {
+                res.status(400).json({
+                    message: "please send user ID"
+                });
+            } else if (photo.favoritesIds.includes(req.body.userId)) {
+                res.status(409).json({
+                    message: "user already favorited the photo"
+                });
+            } else {
+                photo.favoritesIds.push(req.body.userId);
+                Photo.updateOne({_id: req.params.photoId}, {favoritesIds: photo.favoritesIds})
+                .exec()
+                .then(res.status(200).json({
+                    message: "added favorite"
+                }))
+                .catch(err => {
+                    res.status(500).json({
+                        message: "invalid parameters",
+                        error: err
+                    });
+                });             
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "invalid parameters",
+                error: err
+            });
+        });
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: "invalid parameters",
+            error: err
+        });
+    }); 
+});
 
+router.post("/photo/remove-favorite/:photoId", checkAuth, (req, res, next) => {
+    Photo.findById(req.params.photoId)
+    .exec()
+    .then(photo => {
+        User.findById(req.body.userId).exec().then(user => {
+            if (!photo) {
+                res.status(404).json({
+                    message: "photo does not exist"
+                });    
+            } else if (!user) {
+                res.status(404).json({
+                    message: "user does not exist"
+                });    
+            } else if (!req.body.userId) {
+                res.status(400).json({
+                    message: "please send user ID"
+                });
+            } else if (!photo.favoritesIds.includes(req.body.userId)) {
+                res.status(409).json({
+                    message: "user didn't favorite the photo"
+                });
+            } else {
+                let index = photo.favoritesIds.indexOf(req.body.userId);
+                if (index > -1) {
+                    console.log(photo.favoritesIds);
+                    photo.favoritesIds.splice(index, 1);
+                    console.log(photo.favoritesIds);
+                    Photo.updateOne({_id: req.params.photoId}, {favoritesIds: photo.favoritesIds})
+                    .exec()
+                    .then(res.status(200).json({
+                        message: "removed favorite"
+                    }))
+                    .catch(err => {
+                        res.status(500).json({
+                            message: "invalid parameters",
+                            error: err
+                        });
+                    });
+                }             
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "invalid parameters",
+                error: err
+            });
+        });
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: "invalid parameters",
+            error: err
+        });
+    }); 
+});
 
 module.exports = router;

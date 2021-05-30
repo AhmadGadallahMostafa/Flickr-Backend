@@ -10,7 +10,8 @@ const photoSchema = mongoose.Schema({
     taggedPeople: [{type: String}],
     tags: [{type: String}],
     cameraName: {type: String},
-    photoPath: String
+    photoPath: String,
+    favoritesIds:[{type: mongoose.Schema.Types.ObjectId}]
 });
 
 module.exports = mongoose.model("Photo", photoSchema);
