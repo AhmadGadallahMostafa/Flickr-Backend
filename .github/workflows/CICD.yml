@@ -111,6 +111,7 @@ jobs:
           npm install
           cp ~/BackUp/.env ~/BackEnd/.env
           sudo cp ~/BackEnd/Server/config /etc/nginx/sites-available/default
+          chmod 777 '/home/ubuntu/BackEnd/API Document/'
           pm2 start ~/BackEnd/server.js --name "BackEnd Server" --watch
           sudo systemctl restart nginx
           EOF
