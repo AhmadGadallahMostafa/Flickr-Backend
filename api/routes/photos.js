@@ -28,6 +28,9 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage});
 
 const Photo = require("../models/photos"); 
+const User = require("../models/user");
+
+const checkAuth=require("../middleware/check-auth")
 
 router.get("/:limit", (req, res, next) => {
     Photo.find({isPublic: true})
@@ -48,60 +51,102 @@ router.get("/:limit", (req, res, next) => {
     });
 });
 
-router.post("/", upload.single("photo"), (req, res, next) => {
-    const photo = new Photo({
-        _id: new mongoose.Types.ObjectId(),
-        authorId: req.body.authorId,
-        title: req.body.title,
-        description: req.body.description,
-        date: req.body.date,
-        isPublic: req.body.isPublic,
-        taggedPeople: req.body.taggedPeople,
-        tags: req.body.tags,
-        cameraName: req.body.cameraName,
-        photoPath: req.file.path
-    });
-    photo.save()
-
+router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
+    User.findById(req.body.authorId)
     .then(result => {
-        res.status(201).json({
-            message: "Photo was saved successfully",
-            createdPhoto: result
-        });
+        if (!result) { 
+            fs.unlink(req.file.path, err => {});
+            res.status(404).json({
+                message: "User does not exist"
+            });
+            res.send(); 
+        } else {
+            const photo = new Photo({
+                _id: new mongoose.Types.ObjectId(),
+                authorId: req.body.authorId,
+                title: req.body.title,
+                description: req.body.description,
+                date: req.body.date,
+                isPublic: req.body.isPublic,
+                taggedPeople: req.body.taggedPeople,
+                tags: req.body.tags,
+                cameraName: req.body.cameraName,
+                photoPath: req.file.path
+            });
+            photo.save()
+            .then(result => {
+                res.status(201).json({
+                    message: "Photo was saved successfully",
+                    createdPhoto: result
+                });
+            })
+            .catch(err => {
+                fs.unlink(req.file.path, err => {});
+                res.status(500).json({  
+                    error: err
+                });
+            });
+        }
     })
-    .catch(err => {
+    .catch((err => {
         fs.unlink(req.file.path, err => {});
-        res.status(500).json({  
+        res.status(500).json({
+            message: "invalid input",  
             error: err
         });
-    });
+    }));
 });
 
 router.get("/photoInfo/:photoId", (req, res, next) => {
-    Photo.find({_id:req.params.photoId})
+    Photo.findById(req.params.photoId)
     .exec()
     .then(docs => {
-        let response = {
-            photoInfo: docs
+        if (!docs) {
+            res.status(404).json({
+                message: "photo does not exist"
+            });
+        } else {
+            let response = {
+                photoInfo: docs
+            }
+            res.status(200).json(response);    
         }
-        res.status(200).json(response);
-    })
+        })
     .catch(err => {
         res.status(500).json({
+            message: "invalid parameters",
             error: err
         });
     });
 });
 
-router.patch("/photoInfo/:photoId", (req, res, next) => {
-    console.log(req.body);
-    Photo.findByIdAndUpdate({_id: req.params.photoId}, {$set: req.body})
+router.patch("/photoInfo/:photoId", checkAuth, (req, res, next) => {
+    Photo.findById(req.params.photoId)
     .exec()
-    .then(res.status(200).json({
-        message: "updated successfully"
-    }))
+    .then(result => {
+        if (!result) {
+            res.status(404).json({
+                message: "photo doesnot exist"
+            });
+        } else if (result.authorId == req.body.userId) {
+            Photo.findByIdAndUpdate(req.params.photoId, {$set: req.body})
+            .exec()
+            .then(res.status(200).json({
+                message: "updated successfully"
+            }))
+            .catch(err => {
+                res.status(500).json({
+                    error: err})
+                });
+        } else {
+            res.status(401).json({
+                message: "you are not authorized to update this photo"
+            });
+        }
+    })
     .catch(err => {
         res.status(500).json({
+            message: "invalid parameters",
             error: err
         });
     });    
@@ -110,63 +155,92 @@ router.patch("/photoInfo/:photoId", (req, res, next) => {
 router.get("/photo/:photoId", (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
-    .then(docs => {
-        res.status(200).sendFile(docs.photoPath);
+    .then(photo => {
+        if (!photo || !fs.existsSync(photo.photoPath)) {
+            res.status(404).json({
+                message: "photo does not exist"
+            });
+        } else {
+            res.status(200).sendFile(photo.photoPath);    
+        }
     })
     .catch(err => {
         res.status(500).json({
+            message: "invalid parameters",
             error: err
         });
     });
 });
 
-router.delete("/photo/:photoId", (req, res, next) => {
-    Photo.findOne({_id: req.params.photoId})
+router.delete("/photo/:photoId", checkAuth, (req, res, next) => {
+    Photo.findById(req.params.photoId)
     .exec()
-    .then(docs => {
-        console.log(docs);
-        fs.unlink(docs.photoPath, err => {});
-        Photo.deleteOne({_id: req.params.photoId})
-        .exec()
-        .then(
-            res.status(200).json({
-                message: "photo deleted successfully"
-            })
-        )
-        .catch( err => {
-            err.status(500).json({
-                error: err
+    .then(photo => {
+        if (!photo) {
+            res.status(404).json({
+                message: "photo does not exist"
             });
-        });
+        } else if (photo.authorId == req.body.userId) {
+            fs.unlink(photo.photoPath, err => {});
+            Photo.deleteOne({_id: req.params.photoId})
+            .exec()
+            .then(
+                res.status(200).json({
+                    message: "photo deleted successfully"
+                }))
+            .catch( err => {
+                err.status(500).json({
+                error: err
+                });
+            });    
+        } else {
+            res.status(401).json({
+                message: "you are not authorized to delete this photo"
+            });
+        }
     })
     .catch(err => {
         res.status(500).json({
+            message: "invalid parameters",
             error: err
         });
     });    
 });
 
-router.patch("/photo/:photoId", upload.single("photo"), (req, res, next) => {
-    Photo.findOne({_id: req.params.photoId})
+router.patch("/photo/:photoId", checkAuth, upload.single("photo"), (req, res, next) => {
+    Photo.findById(req.params.photoId)
     .exec()
-    .then(docs => {
-        fs.unlink(docs.photoPath, err => {});
-        Photo.updateOne({_id: req.params.photoId}, {photoPath: req.file.path})
-        .exec()
-        .then(res.status(200).json({
-            message: "updated successfully"
-        }))
-        .catch(err => {
-            res.status(500).json({
-                error: err
+    .then(photo => {
+        if (!photo) {
+            fs.unlink(req.file.path, err => {});
+            res.status(404).json({
+                message: "photo does not exist"
+            });   
+        } else if (photo.authorId == req.body.userId) {   
+            fs.unlink(photo.photoPath, err => {});
+            Photo.updateOne({_id: req.params.photoId}, {photoPath: req.file.path})
+            .exec()
+            .then(res.status(200).json({
+                message: "updated successfully"
+            }))
+            .catch(err => {
+                res.status(500).json({
+                    error: err
+                });
+            }); 
+        } else {
+            fs.unlink(req.file.path, err => {});
+            res.status(401).json({
+                message: "you are not authorized to edit this photo"
             });
-        });    
+        }   
     })
     .catch(err => {
         res.status(500).json({
+            message: "invalid parameters",
             error: err
         });
-    });    
+    }); 
 });
 
 
