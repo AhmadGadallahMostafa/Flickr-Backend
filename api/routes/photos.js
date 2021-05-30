@@ -54,7 +54,7 @@ router.get("/:limit", (req, res, next) => {
 });
 
 router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
-    User.findById(req.body.authorId)
+    User.findById(req.userData.userId)
     .then(result => {
         if (!result) { 
             fs.unlink(req.file.path, err => {});
@@ -65,7 +65,7 @@ router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
         } else {
             const photo = new Photo({
                 _id: new mongoose.Types.ObjectId(),
-                authorId: req.body.authorId,
+                authorId: req.userData.userId,
                 title: req.body.title,
                 description: req.body.description,
                 date: req.body.date,
@@ -128,9 +128,9 @@ router.patch("/photoInfo/:photoId", checkAuth, (req, res, next) => {
     .then(result => {
         if (!result) {
             res.status(404).json({
-                message: "photo doesnot exist"
+                message: "photo does not exist"
             });
-        } else if (result.authorId == req.body.userId) {
+        } else if (result.authorId == req.userData.userId) {
             Photo.findByIdAndUpdate(req.params.photoId, {$set: req.body})
             .exec()
             .then(res.status(200).json({
@@ -182,7 +182,7 @@ router.delete("/photo/:photoId", checkAuth, (req, res, next) => {
             res.status(404).json({
                 message: "photo does not exist"
             });
-        } else if (photo.authorId == req.body.userId) {
+        } else if (photo.authorId == req.userData.userId) {
             fs.unlink(photo.photoPath, err => {});
             Photo.deleteOne({_id: req.params.photoId})
             .exec()
@@ -218,7 +218,7 @@ router.patch("/photo/:photoId", checkAuth, upload.single("photo"), (req, res, ne
             res.status(404).json({
                 message: "photo does not exist"
             });   
-        } else if (photo.authorId == req.body.userId) {   
+        } else if (photo.authorId == req.userData.userId) {   
             fs.unlink(photo.photoPath, err => {});
             Photo.updateOne({_id: req.params.photoId}, {photoPath: req.file.path})
             .exec()
@@ -249,7 +249,7 @@ router.post("/photo/add-favorite/:photoId", checkAuth, (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
     .then(photo => {
-        User.findById(req.body.userId).exec().then(user => {
+        User.findById(req.userData.userId).exec().then(user => {
             if (!photo) {
                 res.status(404).json({
                     message: "photo does not exist"
@@ -258,16 +258,12 @@ router.post("/photo/add-favorite/:photoId", checkAuth, (req, res, next) => {
                 res.status(404).json({
                     message: "user does not exist"
                 });    
-            } else if (!req.body.userId) {
-                res.status(400).json({
-                    message: "please send user ID"
-                });
-            } else if (photo.favoritesIds.includes(req.body.userId)) {
+            } else if (photo.favoritesIds.includes(req.userData.userId)) {
                 res.status(409).json({
                     message: "user already favorited the photo"
                 });
             } else {
-                photo.favoritesIds.push(req.body.userId);
+                photo.favoritesIds.push(req.userData.userId);
                 Photo.updateOne({_id: req.params.photoId}, {favoritesIds: photo.favoritesIds})
                 .exec()
                 .then(res.status(200).json({
@@ -297,10 +293,11 @@ router.post("/photo/add-favorite/:photoId", checkAuth, (req, res, next) => {
 });
 
 router.post("/photo/remove-favorite/:photoId", checkAuth, (req, res, next) => {
+    console.log(req.userData);
     Photo.findById(req.params.photoId)
     .exec()
     .then(photo => {
-        User.findById(req.body.userId).exec().then(user => {
+        User.findById(req.userData.userId).exec().then(user => {
             if (!photo) {
                 res.status(404).json({
                     message: "photo does not exist"
@@ -309,16 +306,16 @@ router.post("/photo/remove-favorite/:photoId", checkAuth, (req, res, next) => {
                 res.status(404).json({
                     message: "user does not exist"
                 });    
-            } else if (!req.body.userId) {
+            } else if (!req.userData.userId) {
                 res.status(400).json({
                     message: "please send user ID"
                 });
-            } else if (!photo.favoritesIds.includes(req.body.userId)) {
+            } else if (!photo.favoritesIds.includes(req.userData.userId)) {
                 res.status(409).json({
                     message: "user didn't favorite the photo"
                 });
             } else {
-                let index = photo.favoritesIds.indexOf(req.body.userId);
+                let index = photo.favoritesIds.indexOf(req.userData.userId);
                 if (index > -1) {
                     console.log(photo.favoritesIds);
                     photo.favoritesIds.splice(index, 1);
