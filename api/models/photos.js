@@ -11,7 +11,8 @@ const photoSchema = mongoose.Schema({
     tags: [{type: String}],
     cameraName: {type: String},
     photoPath: String,
-    favoritesIds:[{type: mongoose.Schema.Types.ObjectId}]
+    favoritesIds:[{type: mongoose.Schema.Types.ObjectId}],
+    views: {type: Number, default:0}
 });
 
 module.exports = mongoose.model("Photo", photoSchema);

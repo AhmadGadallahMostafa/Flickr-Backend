@@ -32,7 +32,24 @@ const User = require("../models/user");
 
 const checkAuth = require("../middleware/check-auth");
 
-
+router.get("/user-favorite/", checkAuth, (req, res, next) => {
+    console.log(req.userData.userId);
+    Photo.find({favoritesIds: req.userData.userId})
+    .exec()
+    .then(photos => {
+            console.log(photos);
+            res.status(200).json({
+                count: photos.length,
+                favoritePhotos: photos
+            });
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: "invalid parameters",
+            error: err
+        });
+    }); 
+});
 
 router.get("/:limit", (req, res, next) => {
     Photo.find({isPublic: true})
@@ -99,7 +116,25 @@ router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
     }));
 });
 
-router.get("/photoInfo/:photoId", (req, res, next) => {
+router.get("/user-photos/:userId", (req, res, next) => {
+    Photo.find({authorId: req.params.userId})
+    .limit(Number(req.params.limit))
+    .exec()
+    .then(docs => {
+        let response = {
+            size: docs.length,
+            photos: docs
+        }
+        res.status(200).json(response);
+    })
+    .catch(err => {
+        res.status(403).json({
+            error: err
+        });
+    });
+});
+
+router.get("/photo-info/:photoId", (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
     .then(docs => {
@@ -122,7 +157,7 @@ router.get("/photoInfo/:photoId", (req, res, next) => {
     });
 });
 
-router.patch("/photoInfo/:photoId", checkAuth, (req, res, next) => {
+router.patch("/photo-info/:photoId", checkAuth, (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
     .then(result => {
@@ -163,6 +198,7 @@ router.get("/photo/:photoId", (req, res, next) => {
                 message: "photo does not exist"
             });
         } else {
+            Photo.updateOne({_id: req.params.photoId}, {views: (photo.views + 1)}).exec().then();
             res.status(200).sendFile(photo.photoPath);    
         }
     })
@@ -245,7 +281,7 @@ router.patch("/photo/:photoId", checkAuth, upload.single("photo"), (req, res, ne
     }); 
 });
 
-router.post("/photo/add-favorite/:photoId", checkAuth, (req, res, next) => {
+router.post("/photo/favorite/:photoId", checkAuth, (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
     .then(photo => {
@@ -292,8 +328,7 @@ router.post("/photo/add-favorite/:photoId", checkAuth, (req, res, next) => {
     }); 
 });
 
-router.post("/photo/remove-favorite/:photoId", checkAuth, (req, res, next) => {
-    console.log(req.userData);
+router.delete("/photo/favorite/:photoId", checkAuth, (req, res, next) => {
     Photo.findById(req.params.photoId)
     .exec()
     .then(photo => {
@@ -317,9 +352,7 @@ router.post("/photo/remove-favorite/:photoId", checkAuth, (req, res, next) => {
             } else {
                 let index = photo.favoritesIds.indexOf(req.userData.userId);
                 if (index > -1) {
-                    console.log(photo.favoritesIds);
                     photo.favoritesIds.splice(index, 1);
-                    console.log(photo.favoritesIds);
                     Photo.updateOne({_id: req.params.photoId}, {favoritesIds: photo.favoritesIds})
                     .exec()
                     .then(res.status(200).json({
@@ -340,6 +373,28 @@ router.post("/photo/remove-favorite/:photoId", checkAuth, (req, res, next) => {
                 error: err
             });
         });
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: "invalid parameters",
+            error: err
+        });
+    }); 
+});
+
+router.get("/photo/favorite/:photoId", (req, res, next) => {
+    Photo.findById(req.params.photoId)
+    .exec()
+    .then(photo => {
+        if (!photo) {
+            res.status(404).json({
+                message: "photo does not exist"
+            });
+        } else {
+            res.status(200).json({
+                count: photo.favoritesIds.length
+            });
+        }
     })
     .catch(err => {
         res.status(500).json({
