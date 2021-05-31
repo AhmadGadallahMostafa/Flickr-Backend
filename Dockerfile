@@ -1,6 +1,7 @@
 # --------------> The build image
 FROM node:latest AS builder 
 ENV NODE_ENV production
+RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY --chown=node:node . /usr/src/app
 RUN npm install
