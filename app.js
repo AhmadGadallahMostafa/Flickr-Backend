@@ -8,9 +8,11 @@ const mongoose = require("mongoose");
 const photosRoutes = require("./api/routes/photos");
 const usersRoutes=require("./api/routes/user");
 const albumRoutes = require('./api/routes/album');
+const searchRoutes = require("./api/routes/search");
+const galleryRoutes = require('./api/routes/gallery');
+const cameraRoutes = require('./api/routes/camera');
 
-
-mongoose.connect("mongodb+srv://Moaz:" + process.env.MONGO_ATLAS_PW + "@cluster0.c1goi.mongodb.net/Flickerdb?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb+srv://mohammedzaki:1234msm@cluster0.gseta.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true});
 
 
 app.use(morgan("dev"));
@@ -30,7 +32,9 @@ app.use((req, res, next) => {
 app.use("/photos", photosRoutes);
 app.use("/user",usersRoutes);
 app.use('/album',albumRoutes);
-
+app.use('/search',searchRoutes);
+app.use('/gallery',galleryRoutes);
+app.use('/camera',cameraRoutes);
 
 app.use((req, res, next) =>{
     const error = new Error("404 not found");
