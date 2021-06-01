@@ -200,6 +200,7 @@ router.post("/login",(req,res,next)=>
                     },process.env.JWT_KEY,{
                         expiresIn:"1h"
                     });
+                    
                     return res.status(200).json({
                         message:"auth success",
                         token:token
