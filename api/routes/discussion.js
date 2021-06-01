@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Group = require('../models/group');
+const User=require('../models/user');
 const { ObjectID } = require('mongodb');
 const Photo = require('../models/photos');
 const checkAuth = require('../middleware/check-auth');
-const User=require('../models/user');
 const Discussion = require('../models/discussion');
 
 //needs checking after creating a discussion

@@ -99,7 +99,7 @@ router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
                 isPublic: req.body.isPublic,
                 taggedPeople: req.body.taggedPeople,
                 tags: req.body.tags,
-                cameraName: "test",
+                cameraName: req.body.cameraName,
                 photoPath: req.file.path
             });
             photo.save()

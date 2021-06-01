@@ -14,9 +14,8 @@ const photosRoutes = require("./api/routes/photos");
 const usersRoutes = require("./api/routes/user");
 const albumRoutes = require('./api/routes/album');
 const groupRouters = require("./api/routes/group")
-mongoose.connect('mongodb://127.0.0.1:27017/Flickr', {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex: true,useFindAndModify: false,});
 
-//mongoose.connect(process.env.URL, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(process.env.URL, {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(morgan("dev"));
 app.use(express.urlencoded({extended: true}));

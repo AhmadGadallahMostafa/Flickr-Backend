@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Group = require('../models/group');
+const User=require('../models/user');
 const { ObjectID } = require('mongodb');
 const checkAuth = require('../middleware/check-auth');
-const User=require('../models/user');
 const Photo = require('../models/photos');
 const Comment = require('../models/comment')
 
