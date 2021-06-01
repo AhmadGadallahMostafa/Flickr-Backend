@@ -110,7 +110,6 @@ jobs:
           cd ~/BackEnd/
           npm install
           cp ~/BackUp/.env ~/BackEnd/.env
-          sudo cp ~/BackEnd/Server/config /etc/nginx/sites-available/default
           sudo mkdir -p /var/www/thealphaflickr.xyz/docs/
           sudo cp ~/BackEnd/'API Document'/* /var/www/thealphaflickr.xyz/docs/
           pm2 delete all
