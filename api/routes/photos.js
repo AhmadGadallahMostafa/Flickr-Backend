@@ -31,16 +31,32 @@ const Photo = require("../models/photos");
 const User = require("../models/user");
 
 const checkAuth = require("../middleware/check-auth");
+const { Console } = require("console");
 
 router.get("/user-favorite/", checkAuth, (req, res, next) => {
-    console.log(req.userData.userId);
     Photo.find({favoritesIds: req.userData.userId})
     .exec()
     .then(photos => {
-            console.log(photos);
             res.status(200).json({
                 count: photos.length,
                 favoritePhotos: photos
+            });
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: "invalid parameters",
+            error: err
+        });
+    }); 
+});
+
+router.get("/user-notfications/", checkAuth, (req, res, next) => {
+    User.findById(req.userData.userId)
+    .exec()
+    .then(user => {
+            res.status(200).json({
+                count: user.notifications.length,
+                favoritePhotos: user.notifications
             });
     })
     .catch(err => {
@@ -302,9 +318,12 @@ router.post("/photo/favorite/:photoId", checkAuth, (req, res, next) => {
                 photo.favoritesIds.push(req.userData.userId);
                 Photo.updateOne({_id: req.params.photoId}, {favoritesIds: photo.favoritesIds})
                 .exec()
-                .then(res.status(200).json({
-                    message: "added favorite"
-                }))
+                .then(result => {
+                    User.updateOne({_id: photo.authorId}, { $push: { notifications: {date: Date.now(), info: user.firstName + " favorited your " + photo.title + " photo"} } }).exec();
+                    res.status(200).json({
+                        message: "added favorite"
+                    })
+                })
                 .catch(err => {
                     res.status(500).json({
                         message: "invalid parameters",
