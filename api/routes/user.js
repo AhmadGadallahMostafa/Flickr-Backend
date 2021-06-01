@@ -6,7 +6,13 @@ const jwt=require("jsonwebtoken");
 require("dotenv").config();
 
 const User=require('../models/user');
-const checkAuth=require("../middleware/check-auth")
+const Card=require('../models/cards');
+
+const checkAuth=require("../middleware/check-auth");
+const user = require("../models/user");
+
+
+
 
 
 router.delete("/:userid",checkAuth,(req,res,next)=>{
@@ -48,9 +54,19 @@ router.delete("/:userid",checkAuth,(req,res,next)=>{
 });
 
 
-router.patch("/:userid",checkAuth,(req,res,next)=>{
+router.patch("/:userid",(req,res,next)=>{
     if(req.body.password.length>8 && req.body.age>=18 )
     {
+        User.find({email:req.body.email}).exec()
+        .then(user=>{
+            if(user.length>=1 && (req.params.userid != user[0]._id))
+            {
+                console.log(user.length);
+                
+                return res.status(409).json({
+                    message:"MailExists"
+                });
+            }else{
     
             bcrypt.hash(req.body.password,10,(err,hash)=>{
 
@@ -67,15 +83,18 @@ router.patch("/:userid",checkAuth,(req,res,next)=>{
                         "secondName":req.body.secondName,
                         "age":req.body.age,
                         "password":hash,
+                        "email":req.body.email
                     
-                    }
-                    , function(err, result){
+                    }, 
+                    {new: true},
+                    function(err, result){
                 
                         if(err){
                             res.send(err)
                         }
                         else{
-                            res.send(result)
+                            res.status(200).
+                            json({ message:"UserUpdated"});
                         }
                 
                     });
@@ -83,6 +102,8 @@ router.patch("/:userid",checkAuth,(req,res,next)=>{
                 }
             
                });
+            }
+        });
         
     }else{
     res.json({
@@ -90,26 +111,23 @@ router.patch("/:userid",checkAuth,(req,res,next)=>{
     });
 }
 
-
 });
 
 router.get("/:userid",(req,res,next)=>{
-    User.findOne({_id: req.params.userid}).exec().then(user => {
-            let found = {
-                firstName:user.firstName,
-                secondName:user.secondName
-            };
-            res.status(200).json(found);
-
-
-            }
-            
-
-        );
-
-    });
-
-
+    User.find({_id: req.params.userid}).exec().then(user => {
+            res.status(200);
+            res.json({firstname:user[0].firstName,
+            secondname:user[0].secondName,
+                age:user[0].age,
+                email:user[0].email,
+                getPro:user[0].getPro,
+                followers:user[0].followers,
+                following:user[0].following
+                
+        });
+     }
+   );
+});
 
 router.post("/signup",(req,res,next)=>
 {
@@ -159,8 +177,8 @@ router.post("/signup",(req,res,next)=>
         }
     });
 }else{
-    res.json({
-        message:"error"
+    res.status(404).json({
+        message:"page not found"
     });
 }
 
@@ -200,6 +218,7 @@ router.post("/login",(req,res,next)=>
                     },process.env.JWT_KEY,{
                         expiresIn:"1h"
                     });
+                    
                     return res.status(200).json({
                         message:"auth success",
                         token:token
@@ -223,6 +242,113 @@ router.post("/login",(req,res,next)=>
     });
 
 });
+
+router.put("/follow",checkAuth,(req,res,next)=>{
+    
+    var flag=0;
+
+    User.find({_id:req.userData.userId}).exec()
+    .then(user=>{
+        var followingArrLength = user[0].following.length;
+        
+        for(i=0;i<followingArrLength;i++){
+            if(user[0].following[i]==req.body.followId)
+            {
+                flag=1;
+                console.log(flag);
+               
+            }
+        }
+        console.log(flag);
+        if(flag==0)
+        {
+        User.findByIdAndUpdate(req.body.followId,{
+            $push:{followers:req.userData.userId}
+        },{new:true}
+        ,(err,result)=>{
+            if(err)
+            {
+                return res.status(422).json({error:err})
+            } User.findByIdAndUpdate(req.userData.userId,{
+                $push:{following:req.body.followId}
+            },{new:true}).then(result=>{
+                res.status(200).json(result)})
+                .catch(err=>{
+                    return res.status(422).json({error:err})
+                })
+            
+        
+            });
+        }else{
+            res.status(409).json({Error:"AlreadyFollows"})
+        }
+
+
+    });
+
+    
+});
+
+router.put("/unfollow",checkAuth,(req,res,next)=>{
+    
+   
+        User.findByIdAndUpdate(req.body.unfollowId,{
+            $pull:{followers:req.userData.userId}
+        },{new:true}
+        ,(err,result)=>{
+            if(err)
+            {
+                return res.status(422).json({error:err})
+            } User.findByIdAndUpdate(req.userData.userId,{
+                $pull:{following:req.body.unfollowId}
+            },{new:true}).then(result=>{
+                res.status(200).json(result)})
+                .catch(err=>{
+                    return res.status(422).json({error:err})
+                })
+            
+        
+            });
+
+
+
+
+    
+});
+
+router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
+    const card=new Card({
+        name:req.body.name,
+    streetAddress:req.body.streetAddress,
+    city:req.body.city,
+    counrty:req.body.counrty,
+    state:req.body.state,
+    zipCode:req.body.zipCode,
+    creditCardNumber:req.body.creditCardNumber,
+    owner:req.userData.userId,
+
+    });
+    card.save().then(result=>{
+        User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
+        res.status(201).json({
+            message:"GetProSuccessful"
+
+        })
+    })
+        
+        .catch(err=> {
+            res.status(500).json({
+                error:err
+    
+            })
+        })
+    });
+
+
+
+
+   
+    
 
 
 
