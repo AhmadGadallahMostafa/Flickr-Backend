@@ -1,5 +1,6 @@
 const mongoose=require("mongoose");
 
+
 const userSchema= new mongoose.Schema({
 
     firstName:{type:String,required:true},
@@ -7,7 +8,9 @@ const userSchema= new mongoose.Schema({
     age:{type:Number,required:true},
     email:{type:String,required:true,unique:true},
     password:{type:String,required:true},
-    notifications:[{date:{type:Date},info:{type:String}}]
+    getPro:{type:Boolean},
+    followers:[{type:mongoose.Schema.Types.ObjectId}],
+    following:[{type:mongoose.Schema.Types.ObjectId}]
 });
 
 module.exports= new mongoose.model("User",userSchema);
