@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-
+const user = require("./user"); 
 const photoSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    authorId: String,
+    authorId: {type: mongoose.Schema.Types.ObjectId, required: true},
     title: {type: String, required: true},
     description: String,
     date: {type: Date, default: Date.now},
@@ -10,7 +10,9 @@ const photoSchema = mongoose.Schema({
     taggedPeople: [{type: String}],
     tags: [{type: String}],
     cameraName: {type: String},
-    photoPath: String
+    photoPath: String,
+    favoritesIds:[{type: mongoose.Schema.Types.ObjectId}],
+    views: {type: Number, default:0}
 });
 
 module.exports = mongoose.model("Photo", photoSchema);
