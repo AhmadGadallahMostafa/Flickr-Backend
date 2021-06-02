@@ -19,7 +19,15 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({storage: storage});
+const fileFilter = (req, file, cb) => {
+    var ext = path.extname(file.originalname);
+        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+            return cb(new Error('only images are allowed'))
+        }
+        cb(null, true)
+};
+
+const upload = multer({storage: storage, fileFilter: fileFilter , limits: {fileSize: 1024 * 1024 * 10}});
 
 const Photo = require("../models/photos"); 
 const User = require("../models/user");
@@ -120,7 +128,7 @@ router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
     .catch((err => {
         fs.unlink(req.file.path, err => {});
         res.status(500).json({
-            message: "invalid input",  
+            message: "invalid parameters",  
             error: err
         });
     }));
