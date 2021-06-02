@@ -52,13 +52,13 @@ router.get("/user-favorite/", checkAuth, (req, res, next) => {
     }); 
 });
 
-router.get("/user-notfications/", checkAuth, (req, res, next) => {
+router.get("/user-notifications/", checkAuth, (req, res, next) => {
     User.findById(req.userData.userId)
     .exec()
     .then(user => {
             res.status(200).json({
                 count: user.notifications.length,
-                favoritePhotos: user.notifications
+                notifications: user.notifications
             });
     })
     .catch(err => {
@@ -321,7 +321,9 @@ router.post("/photo/favorite/:photoId", checkAuth, (req, res, next) => {
                 Photo.updateOne({_id: req.params.photoId}, {favoritesIds: photo.favoritesIds})
                 .exec()
                 .then(result => {
-                    User.updateOne({_id: photo.authorId}, { $push: { notifications: {date: Date.now(), info: user.firstName + " favorited your " + photo.title + " photo"} } }).exec();
+                    if (req.userData.userId != photo.authorId) {
+                        User.updateOne({_id: photo.authorId}, { $push: { notifications: {date: Date.now(), info: user.firstName + " favorited your " + photo.title + " photo"} } }).exec();
+                    }
                     res.status(200).json({
                         message: "added favorite"
                     })
