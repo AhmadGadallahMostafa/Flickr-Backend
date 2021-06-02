@@ -10,7 +10,10 @@ const userSchema= new mongoose.Schema({
     password:{type:String,required:true},
     getPro:{type:Boolean},
     followers:[{type:mongoose.Schema.Types.ObjectId}],
-    following:[{type:mongoose.Schema.Types.ObjectId}]
+    following:[{type:mongoose.Schema.Types.ObjectId}],
+    notifications:[{date:{type:Date},info:{type:String}}],
+    date: {type: Date, default: Date.now}
+
 });
 
 module.exports= new mongoose.model("User",userSchema);

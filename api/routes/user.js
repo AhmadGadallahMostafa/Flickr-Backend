@@ -11,8 +11,21 @@ const Card=require('../models/cards');
 const checkAuth=require("../middleware/check-auth");
 const user = require("../models/user");
 
+//const nodemailer=require("nodemailer");
+//const sendgridTransport=require("nodemailer-sendgrid-transport");
 
+//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
+const nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true, //ssl
+    auth: {
+        user: 'noreply@thealphaflickr.xyz',
+        pass: '36Q?Zk.GnFz@cWn'
+    }
+});
 
 
 router.delete("/:userid",checkAuth,(req,res,next)=>{
@@ -161,15 +174,17 @@ router.post("/signup",(req,res,next)=>
             
                     });
                     user.save()
-                    .then(result=>{
+                    .then(user=>{
+                        
                         res.status(201).json({
                             message:"user created"
             
                         })
+                    })
                         .catch(err=> {
                             console.log(err);
                         })
-                    });
+                    
             
                 }
             
@@ -185,6 +200,79 @@ router.post("/signup",(req,res,next)=>
 
     
 });
+
+
+router.post("/forget",(req,res,next)=>{
+
+    User.find({email:req.body.email}).exec()
+    .then(user=>{
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.zoho.com',
+            port: 465,
+            secure: true, //ssl
+            auth: {
+                user: 'noreply@thealphaflickr.xyz',
+                pass: '36Q?Zk.GnFz@cWn'
+            },
+            tls:{
+                rejectUnauthorized:false
+            }
+        });
+        const mailOptions = {
+            from: "noreply@thealphaflickr.xyz", // sender address
+            to: user[0].email, // list of receivers
+            subject: 'Your password ', // Subject line
+            text: 'Hello world?', // plain text body
+            html: '<b>visit  www.thealphaflickr.xyz/user/</b>'+user[0].password
+             // html body
+          };
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.log(error);
+              res.status(400).send({success: false})
+            } else {
+              res.status(200).send({success: true});
+            }
+          });
+    })
+});
+
+router.post("/message/:userid",(req,res,next)=>{
+    User.find({email:req.body.email}).exec().then(result=>{
+
+   
+    User.find({_id:req.params.userid}).exec().then(user=>{
+   const transporter = nodemailer.createTransport({
+       host: 'smtp.zoho.com',
+       port: 465,
+       secure: true, //ssl
+       auth: {
+           user: 'noreply@thealphaflickr.xyz',
+           pass: '36Q?Zk.GnFz@cWn'
+       },
+       tls:{
+           rejectUnauthorized:false
+       }
+   });
+   const mailOptions = {
+       from: "noreply@thealphaflickr.xyz", // sender address
+       to: result[0].email, // list of receivers
+       subject: req.body.subject, // Subject line
+        // plain text body
+       html: user[0].firstName+ "<p>sent you a message</p>" +req.body.message // html body
+     };
+     transporter.sendMail(mailOptions, (error, info) => {
+       if (error) {
+         console.log(error);
+         res.status(400).send({success: false})
+       } else {
+         res.status(200).send({success: true});
+       }
+     });
+   })
+});
+
+   });
 
 router.post("/login",(req,res,next)=>
 {
@@ -308,13 +396,37 @@ router.put("/unfollow",checkAuth,(req,res,next)=>{
                 })
             
         
-            });
+            }); 
+});
+
+router.get("/followers/:userid",(req,res,next)=>{
+    
+   User.find({_id:req.params.userid}).exec().then(user=>{
+       res.status(200).json({
+           followers:user[0].followers
 
 
+       });
 
-
+   });
     
 });
+router.get("/following/:userid",(req,res,next)=>{
+    
+    User.find({_id:req.params.userid}).exec().then(user=>{
+        res.status(200).json({
+            following:user[0].following
+ 
+ 
+        });
+ 
+    });
+     
+ });
+
+ 
+
+
 
 router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
     const card=new Card({
@@ -322,7 +434,8 @@ router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
     streetAddress:req.body.streetAddress,
     city:req.body.city,
     counrty:req.body.counrty,
-    state:req.body.state,
+    cvc:req.body.cvc,
+    expiryDate:req.body.expiryDate,
     zipCode:req.body.zipCode,
     creditCardNumber:req.body.creditCardNumber,
     owner:req.userData.userId,
@@ -337,14 +450,72 @@ router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
     })
         
         .catch(err=> {
-            res.status(500).json({
+            res.status(422).json({
                 error:err
     
             })
         })
     });
 
+router.post("/get-pro/annual",checkAuth,(req,res,next)=>{
+        const card=new Card({
+            name:req.body.name,
+        streetAddress:req.body.streetAddress,
+        city:req.body.city,
+        counrty:req.body.counrty,
+        cvc:req.body.cvc,
+        expiryDate:req.body.expiryDate,
+        zipCode:req.body.zipCode,
+        creditCardNumber:req.body.creditCardNumber,
+        owner:req.userData.userId,
+    
+        });
+        card.save().then(result=>{
+            User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
+            res.status(201).json({
+                message:"GetProSuccessful"
+    
+            })
+        })
+            
+            .catch(err=> {
+                res.status(422).json({
+                    error:err
+        
+                })
+            })
+        });
 
+
+ router.post("/get-pro/3-month",checkAuth,(req,res,next)=>{
+            const card=new Card({
+                name:req.body.name,
+            streetAddress:req.body.streetAddress,
+            city:req.body.city,
+            counrty:req.body.counrty,
+            cvc:req.body.cvc,
+            expiryDate:req.body.expiryDate,
+            postalCode:req.body.postalCode,
+            zipCode:req.body.zipCode,
+            creditCardNumber:req.body.creditCardNumber,
+            owner:req.userData.userId,
+        
+            });
+            card.save().then(result=>{
+                User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
+                res.status(201).json({
+                    message:"GetProSuccessful"
+        
+                })
+            })
+                
+                .catch(err=> {
+                    res.status(422).json({
+                        error:err
+            
+                    })
+                })
+            });
 
 
    
