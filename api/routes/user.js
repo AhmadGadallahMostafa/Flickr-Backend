@@ -24,6 +24,9 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: 'noreply@thealphaflickr.xyz',
         pass: '36Q?Zk.GnFz@cWn'
+    },
+    tls:{
+        rejectUnauthorized:false
     }
 });
 
@@ -129,7 +132,8 @@ router.patch("/:userid",(req,res,next)=>{
 router.get("/:userid",(req,res,next)=>{
     User.find({_id: req.params.userid}).exec().then(user => {
             res.status(200);
-            res.json({firstname:user[0].firstName,
+            res.json({id:user[0]._id,
+                firstname:user[0].firstName,
             secondname:user[0].secondName,
                 age:user[0].age,
                 email:user[0].email,
@@ -206,18 +210,7 @@ router.post("/forget",(req,res,next)=>{
 
     User.find({email:req.body.email}).exec()
     .then(user=>{
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.zoho.com',
-            port: 465,
-            secure: true, //ssl
-            auth: {
-                user: 'noreply@thealphaflickr.xyz',
-                pass: '36Q?Zk.GnFz@cWn'
-            },
-            tls:{
-                rejectUnauthorized:false
-            }
-        });
+        
         const mailOptions = {
             from: "noreply@thealphaflickr.xyz", // sender address
             to: user[0].email, // list of receivers
@@ -516,6 +509,7 @@ router.post("/get-pro/annual",checkAuth,(req,res,next)=>{
                     })
                 })
             });
+
 
 
    

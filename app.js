@@ -8,6 +8,8 @@ const mongoose = require("mongoose");
 
 require("dotenv").config();
 const usersRoutes = require("./api/routes/user");
+const resetRoutes = require("./api/routes/reset");
+
 //mongoose.connect('mongodb://127.0.0.1:27017/Flickr', {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex: true,useFindAndModify: false,});
 
 mongoose.connect(process.env.URL, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -26,6 +28,8 @@ app.use((req, res, next) => {
     next();
 });
 app.use("/user",usersRoutes);
+app.use("/reset",resetRoutes);
+
 
 app.use((req, res, next) =>{
     const error = new Error("404 not found");
