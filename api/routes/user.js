@@ -244,9 +244,6 @@ router.post("/message/:userid",checkAuth,(req,res,next)=>{
        auth: {
            user: 'noreply@thealphaflickr.xyz',
            pass: process.env.USER_PASSWORD
-       },
-       tls:{
-           rejectUnauthorized:false
        }
    });
    const mailOptions = {
