@@ -7,8 +7,7 @@ const Photos = require('../models/photos');
 const Search = require('../models/search');
 const Group = require('../models/group');
 
-const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
+
 
 
 
@@ -78,10 +77,11 @@ router.get('/photo',(req, res, next) => {
 // searching for user
 
 router.get('/user',(req, res, next) => {
-    let  term   = req.body.firstName;
-    let  term2   = req.body.secondName;    
+    let  term   = req.body.name;
+ //let  term2   = req.body.name;    
     
-    User.find( { firstName : {$regex: term, $options: '$i' } } ||  { secondName : {$regex: term2, $options: '$i' }} ) 
+   //User.find( { secondName : {$regex: term, $options: '$i' }}  || {firstName : {$regex: term, $options: '$i' }} ) 
+    User.find( { $or: [{ firstName : {$regex: term, $options: '$i' }} , {secondName : {$regex: term, $options: '$i' }} ]}) 
 
     .then(docs =>{
         const response = {
