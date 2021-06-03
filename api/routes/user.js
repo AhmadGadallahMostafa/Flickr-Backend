@@ -243,7 +243,7 @@ router.post("/message/:userid",checkAuth,(req,res,next)=>{
        secure: true, //ssl
        auth: {
            user: 'noreply@thealphaflickr.xyz',
-           pass: '36Q?Zk.GnFz@cWn'
+           pass: process.env.USER_PASSWORD
        },
        tls:{
            rejectUnauthorized:false
