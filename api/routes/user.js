@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
     secure: true, //ssl
     auth: {
         user: 'noreply@thealphaflickr.xyz',
-        pass: '36Q?Zk.GnFz@cWn'
+        pass: process.env.USER_PASSWORD
     }
 });
 
