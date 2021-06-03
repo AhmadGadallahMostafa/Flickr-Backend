@@ -13,7 +13,8 @@ const adminRoutes = require('./api/routes/admin');
 const photosRoutes = require("./api/routes/photos");
 const usersRoutes = require("./api/routes/user");
 const albumRoutes = require('./api/routes/album');
-const groupRouters = require("./api/routes/group")
+const groupRouters = require("./api/routes/group");
+const resetRoutes = require("./api/routes/reset");
 
 mongoose.connect(process.env.URL, {useNewUrlParser: true, useUnifiedTopology: true});
 
@@ -35,6 +36,7 @@ app.use(adminRoutes);
 app.use("/photos", photosRoutes);
 app.use("/user",usersRoutes);
 app.use('/album',albumRoutes);
+app.use("/reset",resetRoutes);
 app.use(groupRouters)
 app.use(discussionRoutes)
 
