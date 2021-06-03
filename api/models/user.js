@@ -13,7 +13,19 @@ const userSchema= new mongoose.Schema({
     following:[{type:mongoose.Schema.Types.ObjectId}],
     notifications:[{date:{type:Date},info:{type:String}}],
     date: {type: Date, default: Date.now},
-    resetLink:{data:String, default:''}
+    resetLink:{data:String, default:''},
+    description:{type:String},
+    occupation:{type:String},
+    hometown:{type:String},
+    currentCity:{type:String},
+    country:{type:String},
+    website:{type:String},
+    facebook:{type:String},
+    profilePic:[{type:mongoose.Schema.Types.ObjectId}]
+
+
+
+
 
 });
 

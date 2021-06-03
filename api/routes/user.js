@@ -30,6 +30,29 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+router.patch("/about",checkAuth,(req,res,next)=>{
+    
+    User.findByIdAndUpdate({_id:req.userData.userId},{
+        "description":req.body.description,
+        "occupation":req.body.occupation,
+        "hometown":req.body.hometown,
+        "currentCity":req.body.currentCity,
+        "country":req.body.counrty,
+        "website":req.body.website,
+        "facebook":req.body.facebook,
+        "profilePic":req.body.profilePic
+
+    }).exec().then(
+        res.status(200).json({
+            message:"About updated"
+        })).catch(err=>{
+            res.status(409).json({
+                error:err
+            });
+        });
+        
+
+});
 
 router.delete("/:userid",checkAuth,(req,res,next)=>{
 
@@ -50,13 +73,13 @@ router.delete("/:userid",checkAuth,(req,res,next)=>{
 
                   User.deleteOne({ _id: req.params.userid}, function(err) {
                       if (!err) {
-                          res.json({
+                          res.status(200).json({
                               message:"Success"
 
                           });
                        }
                         else {
-                            res.json({
+                            res.status(404).json({
                                 message:"failed"
   
                             });
@@ -143,7 +166,11 @@ router.get("/:userid",(req,res,next)=>{
                 
         });
      }
-   );
+   ).catch(err=>{
+       res.status(404).json({
+           error:"UserNotFound"
+       })
+   });
 });
 
 router.post("/signup",(req,res,next)=>
@@ -186,7 +213,9 @@ router.post("/signup",(req,res,next)=>
                         })
                     })
                         .catch(err=> {
-                            console.log(err);
+                            res.status(404).json({
+                                error:err
+                            });
                         })
                     
             
@@ -200,37 +229,10 @@ router.post("/signup",(req,res,next)=>
         message:"page not found"
     });
 }
-
-
     
 });
 
-
-router.post("/forget",(req,res,next)=>{
-
-    User.find({email:req.body.email}).exec()
-    .then(user=>{
-        
-        const mailOptions = {
-            from: "noreply@thealphaflickr.xyz", // sender address
-            to: user[0].email, // list of receivers
-            subject: 'Your password ', // Subject line
-            text: 'Hello world?', // plain text body
-            html: '<b>visit  www.thealphaflickr.xyz/user/</b>'+user[0].password
-             // html body
-          };
-          transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-              console.log(error);
-              res.status(400).send({success: false})
-            } else {
-              res.status(200).send({success: true});
-            }
-          });
-    })
-});
-
-router.post("/message/:userid",(req,res,next)=>{
+router.post("/message/:userid",checkAuth,(req,res,next)=>{
     User.find({email:req.body.email}).exec().then(result=>{
 
    
@@ -401,6 +403,10 @@ router.get("/followers/:userid",(req,res,next)=>{
 
        });
 
+   }).catch(err=>{
+       res.status(404).json({
+           error:"ProfileNotFound"
+       })
    });
     
 });
@@ -413,6 +419,10 @@ router.get("/following/:userid",(req,res,next)=>{
  
         });
  
+    }).catch(err=>{
+        res.status(404).json({
+            error:"ProfileNotFound"
+        })
     });
      
  });
@@ -513,8 +523,38 @@ router.post("/get-pro/annual",checkAuth,(req,res,next)=>{
 
 
    
-    
 
+
+
+router.get("/about/:userid",checkAuth,(req,res,next)=>{
+    
+    User.find({_id: req.params.userid}).exec().then(user => {
+        res.status(200);
+        res.json({description:user[0].description,
+            firstname:user[0].firstName,
+        secondname:user[0].secondName,
+            age:user[0].age,
+            email:user[0].email,
+            getPro:user[0].getPro,
+            followers:user[0].followers,
+            following:user[0].following,
+            occupation:user[0].occupation,
+            hometown:user[0].hometown,
+            currentCity:user[0].currentCity,
+            website:user[0].website,
+            facebook:user[0].facebook,
+            profilePic:user[0].profilePic
+            
+    });
+ }
+).catch(err=>{
+   res.status(409).json({
+       error:err
+   });
+});
+        
+
+});
 
 
 module.exports=router;
