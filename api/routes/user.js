@@ -24,9 +24,6 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: 'noreply@thealphaflickr.xyz',
         pass: '36Q?Zk.GnFz@cWn'
-    },
-    tls:{
-        rejectUnauthorized:false
     }
 });
 
@@ -237,15 +234,6 @@ router.post("/message/:userid",checkAuth,(req,res,next)=>{
 
    
     User.find({_id:req.params.userid}).exec().then(user=>{
-   const transporter = nodemailer.createTransport({
-       host: 'smtp.zoho.com',
-       port: 465,
-       secure: true, //ssl
-       auth: {
-           user: 'noreply@thealphaflickr.xyz',
-           pass: process.env.USER_PASSWORD
-       }
-   });
    const mailOptions = {
        from: "noreply@thealphaflickr.xyz", // sender address
        to: result[0].email, // list of receivers
