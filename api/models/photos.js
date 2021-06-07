@@ -13,6 +13,7 @@ const photoSchema = mongoose.Schema({
     photoPath: String,
     favoritesIds:[{type: mongoose.Schema.Types.ObjectId}],
     views: {type: Number, default:0},
+    URL: String,
     comments: [{
         comment:{
         type: mongoose.Schema.Types.ObjectId,
