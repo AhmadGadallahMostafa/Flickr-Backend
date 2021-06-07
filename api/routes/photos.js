@@ -19,7 +19,15 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({storage: storage});
+const fileFilter = (req, file, cb) => {
+    var ext = path.extname(file.originalname);
+        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+            return cb(new Error('only images are allowed'))
+        }
+        cb(null, true)
+};
+
+const upload = multer({storage: storage, fileFilter: fileFilter , limits: {fileSize: 1024 * 1024 * 10}});
 
 const Photo = require("../models/photos"); 
 const User = require("../models/user");
@@ -44,13 +52,13 @@ router.get("/user-favorite/", checkAuth, (req, res, next) => {
     }); 
 });
 
-router.get("/user-notfications/", checkAuth, (req, res, next) => {
+router.get("/user-notifications/", checkAuth, (req, res, next) => {
     User.findById(req.userData.userId)
     .exec()
     .then(user => {
             res.status(200).json({
                 count: user.notifications.length,
-                favoritePhotos: user.notifications
+                notifications: user.notifications
             });
     })
     .catch(err => {
@@ -99,7 +107,7 @@ router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
                 isPublic: req.body.isPublic,
                 taggedPeople: req.body.taggedPeople,
                 tags: req.body.tags,
-                cameraName: "test",
+                cameraName: req.body.cameraName,
                 photoPath: req.file.path
             });
             photo.save()
@@ -120,7 +128,7 @@ router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
     .catch((err => {
         fs.unlink(req.file.path, err => {});
         res.status(500).json({
-            message: "invalid input",  
+            message: "invalid parameters",  
             error: err
         });
     }));
@@ -313,7 +321,9 @@ router.post("/photo/favorite/:photoId", checkAuth, (req, res, next) => {
                 Photo.updateOne({_id: req.params.photoId}, {favoritesIds: photo.favoritesIds})
                 .exec()
                 .then(result => {
-                    User.updateOne({_id: photo.authorId}, { $push: { notifications: {date: Date.now(), info: user.firstName + " favorited your " + photo.title + " photo"} } }).exec();
+                    if (req.userData.userId != photo.authorId) {
+                        User.updateOne({_id: photo.authorId}, { $push: { notifications: {date: Date.now(), info: user.firstName + " favorited your " + photo.title + " photo"} } }).exec();
+                    }
                     res.status(200).json({
                         message: "added favorite"
                     })
