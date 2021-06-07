@@ -110,6 +110,7 @@ router.post("/", checkAuth, upload.single("photo"), (req, res, next) => {
                 cameraName: req.body.cameraName,
                 photoPath: req.file.path
             });
+            photo.URL = "https://thealphaflickr.xyz/api/photos/photo/" + photo._id;
             photo.save()
             .then(result => {
                 res.status(201).json({
