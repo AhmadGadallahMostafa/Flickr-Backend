@@ -111,7 +111,7 @@ jobs:
           npm install
           cp ~/BackUp/.env ~/BackEnd/.env
           sudo mkdir -p /var/www/thealphaflickr.xyz/docs/
-          sudo cp ~/BackEnd/'API Document'/* /var/www/thealphaflickr.xyz/docs/
+          sudo cp ~/BackEnd/'API Document'/* /var/www/docs/
           pm2 delete all
           pm2 start ~/BackEnd/server.js --watch --name "BackEnd Server"
           sudo systemctl restart nginx
