@@ -419,14 +419,15 @@ router.get("/following/:userid",(req,res,next)=>{
 router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
     const card=new Card({
         name:req.body.name,
-    streetAddress:req.body.streetAddress,
-    city:req.body.city,
-    counrty:req.body.counrty,
-    cvc:req.body.cvc,
-    expiryDate:req.body.expiryDate,
-    zipCode:req.body.zipCode,
-    creditCardNumber:req.body.creditCardNumber,
-    owner:req.userData.userId,
+            streetAddress:req.body.streetAddress,
+            city:req.body.city,
+            counrty:req.body.counrty,
+            cvc:req.body.cvc,
+            expiryDate:req.body.expiryDate,
+            postalCode:req.body.postalCode,
+            zipCode:req.body.zipCode,
+            creditCardNumber:req.body.creditCardNumber,
+            owner:req.userData.userId,
 
     });
     card.save().then(result=>{
@@ -448,14 +449,15 @@ router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
 router.post("/get-pro/annual",checkAuth,(req,res,next)=>{
         const card=new Card({
             name:req.body.name,
-        streetAddress:req.body.streetAddress,
-        city:req.body.city,
-        counrty:req.body.counrty,
-        cvc:req.body.cvc,
-        expiryDate:req.body.expiryDate,
-        zipCode:req.body.zipCode,
-        creditCardNumber:req.body.creditCardNumber,
-        owner:req.userData.userId,
+            streetAddress:req.body.streetAddress,
+            city:req.body.city,
+            counrty:req.body.counrty,
+            cvc:req.body.cvc,
+            expiryDate:req.body.expiryDate,
+            postalCode:req.body.postalCode,
+            zipCode:req.body.zipCode,
+            creditCardNumber:req.body.creditCardNumber,
+            owner:req.userData.userId,
     
         });
         card.save().then(result=>{
