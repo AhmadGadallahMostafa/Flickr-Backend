@@ -27,6 +27,102 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+
+
+router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
+    const card=new Card({
+        name:req.body.name,
+        streetAddress:req.body.streetAddress,
+        city:req.body.city,
+        counrty:req.body.counrty,
+        cvc:req.body.cvc,
+        expiryDate:req.body.expiryDate,
+        postalCode:req.body.postalCode,
+        zipCode:req.body.zipCode,
+        creditCardNumber:req.body.creditCardNumber,
+        owner:req.userData.userId,
+    
+
+    });
+    card.save().then(result=>{
+        User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
+        res.status(201).json({
+            message:"GetProSuccessful"
+
+        })
+    })
+        
+        .catch(err=> {
+            res.status(422).json({
+                error:err
+    
+            })
+        })
+    });
+
+router.post("/get-pro/annual",checkAuth,(req,res,next)=>{
+        const card=new Card({
+            name:req.body.name,
+            streetAddress:req.body.streetAddress,
+            city:req.body.city,
+            counrty:req.body.counrty,
+            cvc:req.body.cvc,
+            expiryDate:req.body.expiryDate,
+            postalCode:req.body.postalCode,
+            zipCode:req.body.zipCode,
+            creditCardNumber:req.body.creditCardNumber,
+            owner:req.userData.userId,
+        
+        });
+        card.save().then(result=>{
+            User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
+            res.status(201).json({
+                message:"GetProSuccessful"
+    
+            })
+        })
+            
+            .catch(err=> {
+                res.status(422).json({
+                    error:err
+        
+                })
+            })
+        });
+
+
+ router.post("/get-pro/3-month",checkAuth,(req,res,next)=>{
+            const card=new Card({
+                name:req.body.name,
+            streetAddress:req.body.streetAddress,
+            city:req.body.city,
+            counrty:req.body.counrty,
+            cvc:req.body.cvc,
+            expiryDate:req.body.expiryDate,
+            postalCode:req.body.postalCode,
+            zipCode:req.body.zipCode,
+            creditCardNumber:req.body.creditCardNumber,
+            owner:req.userData.userId,
+        
+            });
+            card.save().then(result=>{
+                User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
+                res.status(201).json({
+                    message:"GetProSuccessful"
+        
+                })
+            })
+                
+                .catch(err=> {
+                    res.status(422).json({
+                        error:err
+            
+                    })
+                })
+            });
+
+
+
 router.patch("/about",checkAuth,(req,res,next)=>{
     
     User.findByIdAndUpdate({_id:req.userData.userId},{
@@ -38,7 +134,6 @@ router.patch("/about",checkAuth,(req,res,next)=>{
         "website":req.body.website,
         "facebook":req.body.facebook,
         "profilePic":req.body.profilePic
-
     }).exec().then(
         res.status(200).json({
             message:"About updated"
@@ -415,95 +510,6 @@ router.get("/following/:userid",(req,res,next)=>{
  
 
 
-
-router.post("/get-pro/monthly",checkAuth,(req,res,next)=>{
-    const card=new Card({
-        name:req.body.name,
-    streetAddress:req.body.streetAddress,
-    city:req.body.city,
-    counrty:req.body.counrty,
-    cvc:req.body.cvc,
-    expiryDate:req.body.expiryDate,
-    zipCode:req.body.zipCode,
-    creditCardNumber:req.body.creditCardNumber,
-    owner:req.userData.userId,
-
-    });
-    card.save().then(result=>{
-        User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
-        res.status(201).json({
-            message:"GetProSuccessful"
-
-        })
-    })
-        
-        .catch(err=> {
-            res.status(422).json({
-                error:err
-    
-            })
-        })
-    });
-
-router.post("/get-pro/annual",checkAuth,(req,res,next)=>{
-        const card=new Card({
-            name:req.body.name,
-        streetAddress:req.body.streetAddress,
-        city:req.body.city,
-        counrty:req.body.counrty,
-        cvc:req.body.cvc,
-        expiryDate:req.body.expiryDate,
-        zipCode:req.body.zipCode,
-        creditCardNumber:req.body.creditCardNumber,
-        owner:req.userData.userId,
-    
-        });
-        card.save().then(result=>{
-            User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
-            res.status(201).json({
-                message:"GetProSuccessful"
-    
-            })
-        })
-            
-            .catch(err=> {
-                res.status(422).json({
-                    error:err
-        
-                })
-            })
-        });
-
-
- router.post("/get-pro/3-month",checkAuth,(req,res,next)=>{
-            const card=new Card({
-                name:req.body.name,
-            streetAddress:req.body.streetAddress,
-            city:req.body.city,
-            counrty:req.body.counrty,
-            cvc:req.body.cvc,
-            expiryDate:req.body.expiryDate,
-            postalCode:req.body.postalCode,
-            zipCode:req.body.zipCode,
-            creditCardNumber:req.body.creditCardNumber,
-            owner:req.userData.userId,
-        
-            });
-            card.save().then(result=>{
-                User.findByIdAndUpdate(req.userData.userId,{getPro:true }).exec();
-                res.status(201).json({
-                    message:"GetProSuccessful"
-        
-                })
-            })
-                
-                .catch(err=> {
-                    res.status(422).json({
-                        error:err
-            
-                    })
-                })
-            });
 
 
 
