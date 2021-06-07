@@ -110,6 +110,7 @@ jobs:
           cd ~/BackEnd/
           npm install
           cp ~/BackUp/.env ~/BackEnd/.env
+          sudo rm -rf /var/www/docs/
           sudo mkdir -p /var/www/docs/
           sudo cp -r ~/BackEnd/'API Document'/* /var/www/docs/
           pm2 delete all
